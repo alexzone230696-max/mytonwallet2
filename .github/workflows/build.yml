@@ -25,7 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30
-    if: github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,10 +66,8 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           cd mobile/android
-
           echo -n "$ANDROID_API_KEY_BASE64" | base64 --decode > ./api-key.json
           echo -n "$ANDROID_KEYSTORE_BASE64" | base64 --decode > ./android.keystore
-
           if [ -z "$PUBLISH_REPO" ]; then
             bundle exec fastlane beta
           else
@@ -111,7 +108,7 @@ jobs:
     timeout-minutes: 30
     needs:
       - android-release
-    if: github.event_name != 'workflow_dispatch' && github.ref == 'refs/heads/master' && vars.PUBLISH_REPO != ''
+    if: vars.PUBLISH_REPO != ''
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
